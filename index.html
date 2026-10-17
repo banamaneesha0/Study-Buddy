@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyBuddy | Modern Student Education & Productivity Dashboard</title>
+  <meta name="description" content="All-in-one student dashboard with subject management, timetable, assignments, notes, Pomodoro timer, progress analytics, and daily goals.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js for Visual Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div class="brand-info">
+            <span class="brand-title">Study<span class="brand-accent">Buddy</span></span>
+            <span class="brand-tag">Student Suite</span>
+          </div>
+        </div>
+        <button class="icon-btn mobile-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- User Mini Profile / Streak Banner -->
+      <div class="user-streak-badge">
+        <div class="streak-icon">
+          <i class="fa-solid fa-fire"></i>
+        </div>
+        <div class="streak-details">
+          <span class="streak-count" id="sidebarStreakCount">5 Days</span>
+          <span class="streak-label">Study Streak Active!</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav">
+        <span class="nav-section-label">MAIN MENU</span>
+        <ul class="nav-links">
+          <li class="nav-item active" data-view="dashboard">
+            <a href="#dashboard" class="nav-link">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item" data-view="subjects">
+            <a href="#subjects" class="nav-link">
+              <i class="fa-solid fa-book-open"></i>
+              <span>Subjects</span>
+              <span class="nav-badge" id="navSubjectCount">0</span>
+            </a>
+          </li>
+          <li class="nav-item" data-view="timetable">
+            <a href="#timetable" class="nav-link">
+              <i class="fa-solid fa-calendar-week"></i>
+              <span>Timetable</span>
+            </a>
+          </li>
+          <li class="nav-item" data-view="assignments">
+            <a href="#assignments" class="nav-link">
+              <i class="fa-solid fa-list-check"></i>
+              <span>Assignments</span>
+              <span class="nav-badge alert" id="navPendingAssignments">0</span>
+            </a>
+          </li>
+          <li class="nav-item" data-view="notes">
+            <a href="#notes" class="nav-link">
+              <i class="fa-solid fa-note-sticky"></i>
+              <span>Notes & Docs</span>
+            </a>
+          </li>
+          <li class="nav-item" data-view="pomodoro">
+            <a href="#pomodoro" class="nav-link">
+              <i class="fa-solid fa-clock"></i>
+              <span>Pomodoro Timer</span>
+            </a>
+          </li>
+          <li class="nav-item" data-view="goals">
+            <a href="#goals" class="nav-link">
+              <i class="fa-solid fa-bullseye"></i>
+              <span>Daily Goals</span>
+            </a>
+          </li>
+          <li class="nav-item" data-view="analytics">
+            <a href="#analytics" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Progress Analytics</span>
+            </a>
+          </li>
+        </ul>
+
+        <span class="nav-section-label">PREFERENCES & DATA</span>
+        <ul class="nav-links secondary-nav">
+          <li class="nav-item">
+            <button class="nav-action-btn" id="exportDataBtn">
+              <i class="fa-solid fa-file-export"></i>
+              <span>Backup / Export Data</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <label class="nav-action-btn import-btn-label" for="importDataInput">
+              <i class="fa-solid fa-file-import"></i>
+              <span>Import Data</span>
+              <input type="file" id="importDataInput" accept=".json" style="display:none">
+            </label>
+          </li>
+          <li class="nav-item">
+            <button class="nav-action-btn text-danger" id="resetDemoBtn">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>Reset Sample Data</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="theme-toggle-box">
+          <span class="theme-label"><i class="fa-solid fa-moon"></i> Dark Theme</span>
+          <label class="switch" for="themeToggle">
+            <input type="checkbox" id="themeToggle" aria-label="Toggle theme">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+
+      <!-- Top Header / App Bar -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="greeting-box">
+            <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            <p class="current-date-text" id="currentDateDisplay">Today is Loading...</p>
+          </div>
+        </div>
+
+        <div class="header-center">
+          <div class="search-bar" id="globalSearchTrigger">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" placeholder="Search subjects, assignments, notes... (Ctrl + K)" id="headerSearchInput" readonly>
+            <kbd class="search-shortcut">Ctrl K</kbd>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Quick Add Dropdown -->
+          <div class="dropdown quick-add-dropdown">
+            <button class="btn btn-primary" id="quickAddBtn">
+              <i class="fa-solid fa-plus"></i>
+              <span class="btn-text">Quick Add</span>
+              <i class="fa-solid fa-chevron-down caret-icon"></i>
+            </button>
+            <div class="dropdown-menu" id="quickAddMenu">
+              <button class="dropdown-item" data-action="new-assignment">
+                <i class="fa-solid fa-list-check icon-assignment"></i>
+                <span>New Assignment</span>
+              </button>
+              <button class="dropdown-item" data-action="new-note">
+                <i class="fa-solid fa-note-sticky icon-note"></i>
+                <span>New Note</span>
+              </button>
+              <button class="dropdown-item" data-action="new-subject">
+                <i class="fa-solid fa-book-open icon-subject"></i>
+                <span>New Subject</span>
+              </button>
+              <button class="dropdown-item" data-action="new-schedule">
+                <i class="fa-solid fa-calendar-plus icon-schedule"></i>
+                <span>Add Class / Session</span>
+              </button>
+              <button class="dropdown-item" data-action="new-goal">
+                <i class="fa-solid fa-bullseye icon-goal"></i>
+                <span>New Daily Goal</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Pomodoro Button in Header -->
+          <button class="icon-btn header-pomo-btn" id="headerPomoBtn" title="Pomodoro Mini Status">
+            <i class="fa-solid fa-stopwatch"></i>
+            <span class="pomo-pill" id="headerPomoDisplay">25:00</span>
+          </button>
+
+          <!-- Theme toggle in header for quick access -->
+          <button class="icon-btn theme-btn" id="headerThemeBtn" title="Toggle Theme" aria-label="Toggle Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content Container with Tab Views -->
+      <div class="content-body">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: DASHBOARD -->
+        <!-- ========================================== -->
+        <section class="tab-view active" id="view-dashboard">
+          
+          <!-- Motivational Banner -->
+          <div class="welcome-card">
+            <div class="welcome-text">
+              <div class="greeting-tag">Welcome Back, Scholar! 🚀</div>
+              <h2 id="motivationalGreeting">Keep pushing toward your goals today.</h2>
+              <p class="quote-text" id="quoteText">"Success is the sum of small efforts, repeated day in and day out."</p>
+              <span class="quote-author" id="quoteAuthor">— Robert Collier</span>
+            </div>
+            <div class="welcome-actions">
+              <button class="btn btn-glass" onclick="app.navigateTo('pomodoro')">
+                <i class="fa-solid fa-play"></i> Start 25m Focus
+              </button>
+              <button class="btn btn-light" onclick="app.openModal('modalAssignment')">
+                <i class="fa-solid fa-plus"></i> Add Assignment
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrapper bg-blue">
+                <i class="fa-solid fa-book-bookmark"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-title">Active Subjects</span>
+                <span class="stat-value" id="dashSubjectCount">0</span>
+                <span class="stat-subtext" id="dashSubjectSub">In current semester</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrapper bg-amber">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-title">Pending Tasks</span>
+                <span class="stat-value" id="dashPendingTasks">0</span>
+                <span class="stat-subtext" id="dashDueSoonCount">0 due in 48 hours</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrapper bg-emerald">
+                <i class="fa-solid fa-stopwatch"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-title">Today's Focus Time</span>
+                <span class="stat-value" id="dashTodayStudyTime">0h 0m</span>
+                <span class="stat-subtext" id="dashPomoCount">0 pomodoro sessions</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrapper bg-rose">
+                <i class="fa-solid fa-fire"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-title">Current Streak</span>
+                <span class="stat-value" id="dashStreakValue">5 Days</span>
+                <span class="stat-subtext">Record: <strong id="dashBestStreak">14 Days</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dashboard Two-Column Grid -->
+          <div class="dashboard-grid">
+            
+            <!-- Left Column: Timetable & Assignments -->
+            <div class="dash-col">
+              
+              <!-- Today's Schedule Card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title-group">
+                    <i class="fa-solid fa-calendar-day icon-accent"></i>
+                    <h3 class="card-title">Today's Schedule</h3>
+                  </div>
+                  <a href="#timetable" class="card-link-action" onclick="app.navigateTo('timetable')">View Week &rarr;</a>
+                </div>
+                <div class="card-body">
+                  <div class="today-classes-list" id="dashTodayClasses">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upcoming Deadlines -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title-group">
+                    <i class="fa-solid fa-triangle-exclamation icon-warning"></i>
+                    <h3 class="card-title">Priority Deadlines</h3>
+                  </div>
+                  <a href="#assignments" class="card-link-action" onclick="app.navigateTo('assignments')">All Tasks &rarr;</a>
+                </div>
+                <div class="card-body">
+                  <div class="dash-assignments-list" id="dashDeadlinesList">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Column: Goals, Mini Pomodoro, Recent Notes -->
+            <div class="dash-col">
+
+              <!-- Daily Goals Card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title-group">
+                    <i class="fa-solid fa-bullseye icon-emerald"></i>
+                    <h3 class="card-title">Today's Daily Goals</h3>
+                  </div>
+                  <button class="btn btn-sm btn-outline" onclick="app.openModal('modalGoal')">
+                    <i class="fa-solid fa-plus"></i> Add Goal
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="goals-progress-box">
+                    <div class="progress-bar-label">
+                      <span>Goal Progress</span>
+                      <span id="dashGoalPercentage">0%</span>
+                    </div>
+                    <div class="progress-track">
+                      <div class="progress-fill" id="dashGoalProgressBar" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  <div class="daily-goals-checklist" id="dashGoalsList">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mini Focus Timer Card -->
+              <div class="card mini-pomo-card">
+                <div class="card-header">
+                  <div class="card-title-group">
+                    <i class="fa-solid fa-hourglass-half icon-rose"></i>
+                    <h3 class="card-title">Focus Station</h3>
+                  </div>
+                  <span class="badge badge-primary" id="dashTimerModeBadge">Work Session</span>
+                </div>
+                <div class="card-body text-center">
+                  <div class="mini-timer-display" id="dashTimerDisplay">25:00</div>
+                  <p class="mini-timer-tag" id="dashTimerSubject">Select a subject & focus</p>
+                  <div class="timer-controls-row">
+                    <button class="btn btn-primary btn-round-lg" id="dashTimerToggleBtn" title="Start Timer">
+                      <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button class="btn btn-secondary btn-round-lg" id="dashTimerResetBtn" title="Reset Timer">
+                      <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                    <button class="btn btn-ghost" onclick="app.navigateTo('pomodoro')">
+                      Open Full Timer <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Notes -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title-group">
+                    <i class="fa-solid fa-note-sticky icon-indigo"></i>
+                    <h3 class="card-title">Recent Study Notes</h3>
+                  </div>
+                  <a href="#notes" class="card-link-action" onclick="app.navigateTo('notes')">All Notes &rarr;</a>
+                </div>
+                <div class="card-body">
+                  <div class="dash-notes-list" id="dashRecentNotes">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: SUBJECTS MANAGEMENT -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-subjects">
+          <div class="view-header">
+            <div>
+              <h2 class="section-title">My Subjects & Courses</h2>
+              <p class="section-desc">Manage enrolled courses, color tags, professors, target study hours, and academic syllabus.</p>
+            </div>
+            <button class="btn btn-primary" onclick="app.openModal('modalSubject')">
+              <i class="fa-solid fa-plus"></i> Add New Subject
+            </button>
+          </div>
+
+          <!-- Subject Cards Grid -->
+          <div class="subjects-grid" id="subjectsContainer">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: TIMETABLE & PLANNER -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-timetable">
+          <div class="view-header">
+            <div>
+              <h2 class="section-title">Weekly Study Timetable</h2>
+              <p class="section-desc">Plan lectures, lab sessions, revisions, and study blocks throughout your week.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-outline" id="printTimetableBtn">
+                <i class="fa-solid fa-print"></i> Print / Save PDF
+              </button>
+              <button class="btn btn-primary" onclick="app.openModal('modalSchedule')">
+                <i class="fa-solid fa-plus"></i> Add Class / Session
+              </button>
+            </div>
+          </div>
+
+          <!-- Day Filter Navigation Tabs -->
+          <div class="timetable-day-tabs" id="timetableDayTabs">
+            <button class="day-tab-btn active" data-day="All">All Days</button>
+            <button class="day-tab-btn" data-day="Monday">Monday</button>
+            <button class="day-tab-btn" data-day="Tuesday">Tuesday</button>
+            <button class="day-tab-btn" data-day="Wednesday">Wednesday</button>
+            <button class="day-tab-btn" data-day="Thursday">Thursday</button>
+            <button class="day-tab-btn" data-day="Friday">Friday</button>
+            <button class="day-tab-btn" data-day="Saturday">Saturday</button>
+            <button class="day-tab-btn" data-day="Sunday">Sunday</button>
+          </div>
+
+          <!-- Timetable Content Area -->
+          <div class="timetable-schedule-view" id="timetableScheduleContainer">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: ASSIGNMENTS & TASKS -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-assignments">
+          <div class="view-header">
+            <div>
+              <h2 class="section-title">Assignments & Deadlines</h2>
+              <p class="section-desc">Track coursework, project milestones, exam prep tasks, and due dates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="app.openModal('modalAssignment')">
+              <i class="fa-solid fa-plus"></i> Add Assignment
+            </button>
+          </div>
+
+          <!-- Assignment Filters & Controls Bar -->
+          <div class="filter-bar">
+            <div class="filter-group">
+              <div class="input-with-icon">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="assignmentSearchInput" placeholder="Filter tasks by title...">
+              </div>
+
+              <select class="select-control" id="assignmentSubjectFilter">
+                <option value="All">All Subjects</option>
+                <!-- Populated dynamically -->
+              </select>
+
+              <select class="select-control" id="assignmentStatusFilter">
+                <option value="All">All Statuses</option>
+                <option value="pending">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+
+              <select class="select-control" id="assignmentPriorityFilter">
+                <option value="All">All Priorities</option>
+                <option value="High">High Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="Low">Low Priority</option>
+              </select>
+            </div>
+
+            <div class="filter-actions">
+              <span class="result-count" id="assignmentResultCount">Showing 0 tasks</span>
+            </div>
+          </div>
+
+          <!-- Assignments Container -->
+          <div class="assignments-list" id="assignmentsListContainer">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: NOTES & RESOURCES -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-notes">
+          <div class="view-header">
+            <div>
+              <h2 class="section-title">Study Notes & Knowledge Base</h2>
+              <p class="section-desc">Capture quick lecture summaries, formulas, flash thoughts, and revision notes.</p>
+            </div>
+            <button class="btn btn-primary" onclick="app.openModal('modalNote')">
+              <i class="fa-solid fa-plus"></i> Create Note
+            </button>
+          </div>
+
+          <!-- Notes Filter Bar -->
+          <div class="filter-bar">
+            <div class="filter-group">
+              <div class="input-with-icon">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="notesSearchInput" placeholder="Search notes content, titles, or tags...">
+              </div>
+              <select class="select-control" id="notesSubjectFilter">
+                <option value="All">All Subjects</option>
+                <!-- Populated dynamically -->
+              </select>
+              <select class="select-control" id="notesCategoryFilter">
+                <option value="All">All Categories</option>
+                <option value="Lecture Notes">Lecture Notes</option>
+                <option value="Exam Prep">Exam Prep</option>
+                <option value="Formulas">Formulas & Cheatsheets</option>
+                <option value="Project">Project Research</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Notes Grid -->
+          <div class="notes-grid" id="notesContainer">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 6: POMODORO TIMER -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-pomodoro">
+          <div class="view-header text-center-header">
+            <h2 class="section-title">Focus & Pomodoro Station</h2>
+            <p class="section-desc">Break work into focused 25-minute intervals separated by restorative short breaks.</p>
+          </div>
+
+          <div class="pomodoro-layout">
+            <!-- Left: Main Pomodoro Timer -->
+            <div class="pomodoro-main-card">
+              <!-- Mode Tabs -->
+              <div class="pomo-mode-tabs">
+                <button class="pomo-mode-btn active" data-mode="work" data-time="25">
+                  <i class="fa-solid fa-brain"></i> Study Focus (25m)
+                </button>
+                <button class="pomo-mode-btn" data-mode="shortBreak" data-time="5">
+                  <i class="fa-solid fa-mug-saucer"></i> Short Break (5m)
+                </button>
+                <button class="pomo-mode-btn" data-mode="longBreak" data-time="15">
+                  <i class="fa-solid fa-couch"></i> Long Break (15m)
+                </button>
+              </div>
+
+              <!-- Subject link for session -->
+              <div class="pomo-subject-selector">
+                <label for="pomoSubjectSelect"><i class="fa-solid fa-tag"></i> Studying for:</label>
+                <select id="pomoSubjectSelect" class="select-control sm">
+                  <option value="General Study">General Focus</option>
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+
+              <!-- Circular Progress & Timer Display -->
+              <div class="pomo-display-circle">
+                <svg class="progress-ring" width="280" height="280">
+                  <circle class="progress-ring-circle-bg" stroke-width="12" fill="transparent" r="120" cx="140" cy="140"/>
+                  <circle class="progress-ring-circle" id="pomoProgressRing" stroke-width="12" fill="transparent" r="120" cx="140" cy="140"/>
+                </svg>
+                <div class="pomo-time-center">
+                  <div class="pomo-time-digits" id="pomoTimerDisplay">25:00</div>
+                  <div class="pomo-status-tag" id="pomoStatusTag">Ready to Focus</div>
+                </div>
+              </div>
+
+              <!-- Timer Controls -->
+              <div class="pomo-actions-row">
+                <button class="btn btn-secondary btn-icon-round" id="pomoResetBtn" title="Reset Current Timer">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
+                <button class="btn btn-primary btn-round-xl" id="pomoToggleBtn" title="Start / Pause">
+                  <i class="fa-solid fa-play" id="pomoToggleIcon"></i>
+                </button>
+                <button class="btn btn-secondary btn-icon-round" id="pomoSkipBtn" title="Skip to Next Mode">
+                  <i class="fa-solid fa-forward-step"></i>
+                </button>
+              </div>
+
+              <!-- Session Counter -->
+              <div class="pomo-cycles-tracker">
+                <span class="cycle-label">Completed Sessions Today:</span>
+                <div class="cycle-dots" id="pomoCycleDots">
+                  <span class="dot filled"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
+                <span class="cycle-count" id="pomoCompletedCount">0 / 4</span>
+              </div>
+            </div>
+
+            <!-- Right: Ambient Sound Player & Custom Duration Settings -->
+            <div class="pomodoro-side-panel">
+              <!-- Built-in Ambient Audio Generator (Web Audio API Synthesizer) -->
+              <div class="card ambient-sound-card">
+                <div class="card-header">
+                  <div class="card-title-group">
+                    <i class="fa-solid fa-headphones icon-purple"></i>
+                    <h3 class="card-title">Study White Noise & Ambience</h3>
+                  </div>
+                  <span class="badge badge-success" id="ambientPlayingBadge" style="display:none">Playing</span>
+                </div>
+                <div class="card-body">
+                  <p class="card-subtext">Pure synthesized ambient sounds without external downloads.</p>
+                  
+                  <div class="ambient-sound-buttons">
+                    <button class="ambient-btn" data-sound="rain">
+                      <i class="fa-solid fa-cloud-showers-heavy"></i>
+                      <span>Gentle Rain</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="whitenoise">
+                      <i class="fa-solid fa-wind"></i>
+                      <span>Deep Focus Noise</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="waves">
+                      <i class="fa-solid fa-water"></i>
+                      <span>Ocean Waves</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="cafe">
+                      <i class="fa-solid fa-mug-hot"></i>
+                      <span>Cafe Hum</span>
+                    </button>
+                  </div>
+
+                  <div class="volume-slider-box">
+                    <label for="ambientVolume"><i class="fa-solid fa-volume-high"></i> Volume:</label>
+                    <input type="range" id="ambientVolume" min="0" max="1" step="0.05" value="0.3">
+                  </div>
+
+                  <button class="btn btn-sm btn-outline w-100 mt-2" id="stopAmbientBtn">
+                    <i class="fa-solid fa-stop"></i> Mute Ambience
+                  </button>
+                </div>
+              </div>
+
+              <!-- Custom Duration Settings -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title-group">
+                    <i class="fa-solid fa-sliders icon-blue"></i>
+                    <h3 class="card-title">Custom Intervals (Minutes)</h3>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <form id="pomoSettingsForm" class="pomo-settings-grid">
+                    <div class="form-group-inline">
+                      <label for="customWorkDuration">Work Duration:</label>
+                      <input type="number" id="customWorkDuration" min="1" max="90" value="25" class="input-control sm">
+                    </div>
+                    <div class="form-group-inline">
+                      <label for="customShortDuration">Short Break:</label>
+                      <input type="number" id="customShortDuration" min="1" max="30" value="5" class="input-control sm">
+                    </div>
+                    <div class="form-group-inline">
+                      <label for="customLongDuration">Long Break:</label>
+                      <input type="number" id="customLongDuration" min="1" max="60" value="15" class="input-control sm">
+                    </div>
+                    <button type="submit" class="btn btn-outline btn-sm w-100 mt-2">
+                      <i class="fa-solid fa-check"></i> Save Custom Times
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 7: DAILY GOALS & STREAKS -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-goals">
+          <div class="view-header">
+            <div>
+              <h2 class="section-title">Daily Goals & Habit Tracker</h2>
+              <p class="section-desc">Build disciplined learning habits and maintain your daily study streak.</p>
+            </div>
+            <button class="btn btn-primary" onclick="app.openModal('modalGoal')">
+              <i class="fa-solid fa-plus"></i> Add New Goal
+            </button>
+          </div>
+
+          <!-- Streak Highlight Showcase -->
+          <div class="streak-showcase-card">
+            <div class="streak-hero-left">
+              <div class="streak-flame-wrapper">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+              </div>
+              <div class="streak-hero-text">
+                <div class="streak-hero-title"><span id="goalsStreakBig">5</span> Day Study Streak!</div>
+                <p>Complete at least one study goal every day to keep your flame blazing.</p>
+              </div>
+            </div>
+            <div class="streak-hero-right">
+              <div class="streak-stat-box">
+                <span class="streak-stat-num" id="goalsTodayCompleted">0</span>
+                <span class="streak-stat-lbl">Goals Done Today</span>
+              </div>
+              <div class="streak-stat-box">
+                <span class="streak-stat-num" id="goalsBestRecord">14</span>
+                <span class="streak-stat-lbl">All-Time Best Streak</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Goals List Card -->
+          <div class="card mt-4">
+            <div class="card-header">
+              <div class="card-title-group">
+                <i class="fa-solid fa-list-check icon-accent"></i>
+                <h3 class="card-title">Today's Action Items</h3>
+              </div>
+              <button class="btn btn-sm btn-ghost text-danger" id="clearCompletedGoalsBtn">
+                <i class="fa-solid fa-trash-can"></i> Clear Completed
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="full-goals-list" id="fullGoalsContainer">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW 8: PROGRESS ANALYTICS -->
+        <!-- ========================================== -->
+        <section class="tab-view" id="view-analytics">
+          <div class="view-header">
+            <div>
+              <h2 class="section-title">Academic & Focus Analytics</h2>
+              <p class="section-desc">Visual insights into your study habits, subject time distribution, and assignment progress.</p>
+            </div>
+            <div class="analytics-timeframe">
+              <span class="badge badge-primary">Current Week</span>
+            </div>
+          </div>
+
+          <!-- Analytics Charts Grid -->
+          <div class="analytics-charts-grid">
+            
+            <!-- Study Hours per Day Chart -->
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <i class="fa-solid fa-chart-column icon-blue"></i>
+                  <h3 class="card-title">Study Minutes This Week</h3>
+                </div>
+              </div>
+              <div class="card-body chart-wrapper">
+                <canvas id="weeklyStudyChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Subject Distribution Doughnut Chart -->
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <i class="fa-solid fa-chart-pie icon-purple"></i>
+                  <h3 class="card-title">Subject Focus Distribution</h3>
+                </div>
+              </div>
+              <div class="card-body chart-wrapper">
+                <canvas id="subjectDistributionChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Assignment Completion Status -->
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <i class="fa-solid fa-list-check icon-emerald"></i>
+                  <h3 class="card-title">Assignment Completion Rate</h3>
+                </div>
+              </div>
+              <div class="card-body chart-wrapper">
+                <canvas id="assignmentStatusChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Overall Performance Summary Metric -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <i class="fa-solid fa-award icon-amber"></i>
+                  <h3 class="card-title">Study Efficiency Metrics</h3>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="metrics-list">
+                  <div class="metric-row">
+                    <span class="metric-name"><i class="fa-solid fa-stopwatch"></i> Total Recorded Study Time:</span>
+                    <strong class="metric-val" id="analyticsTotalStudyTime">0h 0m</strong>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name"><i class="fa-solid fa-circle-check"></i> Overall Assignment Completion:</span>
+                    <strong class="metric-val" id="analyticsAssignmentPercent">0%</strong>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name"><i class="fa-solid fa-bullseye"></i> Goal Completion Ratio:</span>
+                    <strong class="metric-val" id="analyticsGoalPercent">0%</strong>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name"><i class="fa-solid fa-fire"></i> Best Streak:</span>
+                    <strong class="metric-val" id="analyticsBestStreak">0 Days</strong>
+                  </div>
+                </div>
+                <div class="study-advice-box mt-3">
+                  <i class="fa-solid fa-lightbulb"></i>
+                  <span>Tip: Distributing study sessions over 3-4 days rather than cramming improves long-term memory retention by over 70%.</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div> <!-- /content-body -->
+
+      <!-- Mobile Bottom Navigation Bar -->
+      <nav class="mobile-bottom-nav">
+        <button class="mobile-nav-btn active" data-view="dashboard">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Home</span>
+        </button>
+        <button class="mobile-nav-btn" data-view="timetable">
+          <i class="fa-solid fa-calendar-week"></i>
+          <span>Timetable</span>
+        </button>
+        <button class="mobile-nav-btn" data-view="assignments">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Tasks</span>
+        </button>
+        <button class="mobile-nav-btn" data-view="notes">
+          <i class="fa-solid fa-note-sticky"></i>
+          <span>Notes</span>
+        </button>
+        <button class="mobile-nav-btn" data-view="pomodoro">
+          <i class="fa-solid fa-clock"></i>
+          <span>Timer</span>
+        </button>
+      </nav>
+
+    </main>
+  </div> <!-- /app-layout -->
+
+
+  <!-- ========================================== -->
+  <!-- MODALS -->
+  <!-- ========================================== -->
+
+  <!-- 1. GLOBAL SEARCH MODAL -->
+  <div class="modal-backdrop" id="modalSearch">
+    <div class="modal search-modal">
+      <div class="search-modal-header">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="liveSearchModalInput" placeholder="Type to search subjects, assignments, notes, schedule..." autofocus>
+        <button class="icon-btn close-modal-btn" data-close="modalSearch"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="search-results-container" id="searchResultsContainer">
+        <div class="search-empty-state">
+          <i class="fa-solid fa-keyboard"></i>
+          <p>Start typing to search across your entire academic workspace...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADD / EDIT SUBJECT MODAL -->
+  <div class="modal-backdrop" id="modalSubject">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="subjectModalTitle">Add New Subject</h3>
+        <button class="icon-btn close-modal-btn" data-close="modalSubject"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formSubject">
+        <input type="hidden" id="subjectId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="subjectName">Subject Name *</label>
+            <input type="text" id="subjectName" class="input-control" placeholder="e.g. Data Structures & Algorithms" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="subjectCode">Subject Code</label>
+              <input type="text" id="subjectCode" class="input-control" placeholder="e.g. CS201">
+            </div>
+            <div class="form-group">
+              <label for="subjectColor">Badge Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="subjectColor" class="color-picker-input" value="#4f46e5">
+                <span class="color-hex-text" id="subjectColorHex">#4f46e5</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="subjectTeacher">Instructor / Professor</label>
+              <input type="text" id="subjectTeacher" class="input-control" placeholder="e.g. Dr. Jane Smith">
+            </div>
+            <div class="form-group">
+              <label for="subjectTargetHours">Weekly Study Goal (Hours)</label>
+              <input type="number" id="subjectTargetHours" class="input-control" min="1" max="40" value="4">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subjectRoom">Room / Virtual Link</label>
+            <input type="text" id="subjectRoom" class="input-control" placeholder="e.g. Science Hall 302 or Zoom Link">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-close="modalSubject">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveSubjectBtn">Save Subject</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. ADD / EDIT ASSIGNMENT MODAL -->
+  <div class="modal-backdrop" id="modalAssignment">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="assignmentModalTitle">Add New Assignment</h3>
+        <button class="icon-btn close-modal-btn" data-close="modalAssignment"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formAssignment">
+        <input type="hidden" id="assignmentId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="assignmentTitle">Assignment / Task Title *</label>
+            <input type="text" id="assignmentTitle" class="input-control" placeholder="e.g. Binary Search Tree Lab Report" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="assignmentSubject">Subject *</label>
+              <select id="assignmentSubject" class="select-control" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="assignmentDueDate">Due Date & Time *</label>
+              <input type="datetime-local" id="assignmentDueDate" class="input-control" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="assignmentPriority">Priority Level</label>
+              <select id="assignmentPriority" class="select-control">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="assignmentStatus">Initial Status</label>
+              <select id="assignmentStatus" class="select-control">
+                <option value="pending" selected>To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="assignmentDesc">Details / Checklist / Requirements</label>
+            <textarea id="assignmentDesc" class="input-control" rows="3" placeholder="Add assignment details, rubric notes, or submission instructions..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-close="modalAssignment">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. ADD / EDIT TIMETABLE SESSION MODAL -->
+  <div class="modal-backdrop" id="modalSchedule">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="scheduleModalTitle">Add Schedule Session</h3>
+        <button class="icon-btn close-modal-btn" data-close="modalSchedule"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formSchedule">
+        <input type="hidden" id="scheduleId">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleSubject">Subject *</label>
+              <select id="scheduleSubject" class="select-control" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="scheduleDay">Day of Week *</label>
+              <select id="scheduleDay" class="select-control" required>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleStartTime">Start Time *</label>
+              <input type="time" id="scheduleStartTime" class="input-control" value="09:00" required>
+            </div>
+            <div class="form-group">
+              <label for="scheduleEndTime">End Time *</label>
+              <input type="time" id="scheduleEndTime" class="input-control" value="10:30" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleType">Session Type</label>
+              <select id="scheduleType" class="select-control">
+                <option value="Lecture">Lecture</option>
+                <option value="Lab">Lab / Practical</option>
+                <option value="Tutorial">Tutorial / Discussion</option>
+                <option value="Self Study">Self Study Block</option>
+                <option value="Revision">Exam Revision</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="scheduleRoom">Location / Room</label>
+              <input type="text" id="scheduleRoom" class="input-control" placeholder="e.g. Hall A / Zoom">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-close="modalSchedule">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Session</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. ADD / EDIT NOTE MODAL -->
+  <div class="modal-backdrop" id="modalNote">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title" id="noteModalTitle">Create Study Note</h3>
+        <button class="icon-btn close-modal-btn" data-close="modalNote"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formNote">
+        <input type="hidden" id="noteId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="noteTitle">Note Title *</label>
+            <input type="text" id="noteTitle" class="input-control" placeholder="e.g. Key Theorems in Discrete Mathematics" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="noteSubject">Related Subject</label>
+              <select id="noteSubject" class="select-control">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="noteCategory">Category</label>
+              <select id="noteCategory" class="select-control">
+                <option value="Lecture Notes">Lecture Notes</option>
+                <option value="Exam Prep">Exam Prep</option>
+                <option value="Formulas">Formulas & Cheatsheets</option>
+                <option value="Project">Project Research</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="noteTags">Tags (comma-separated)</label>
+              <input type="text" id="noteTags" class="input-control" placeholder="e.g. midterm, chapter3, formulas">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="noteContent">Note Content *</label>
+            <textarea id="noteContent" class="input-control note-textarea" rows="8" placeholder="Type your notes here... You can write equations, points, summaries, and code snippets." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-close="modalNote">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Note</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. ADD DAILY GOAL MODAL -->
+  <div class="modal-backdrop" id="modalGoal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Today's Goal</h3>
+        <button class="icon-btn close-modal-btn" data-close="modalGoal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formGoal">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="goalTitle">What is your goal for today? *</label>
+            <input type="text" id="goalTitle" class="input-control" placeholder="e.g. Complete 2 Pomodoro sessions of Calculus" required>
+          </div>
+          <div class="form-group">
+            <label for="goalCategory">Tag / Focus Area</label>
+            <select id="goalCategory" class="select-control">
+              <option value="Study">Study Session</option>
+              <option value="Assignment">Assignment Submission</option>
+              <option value="Revision">Revision</option>
+              <option value="Reading">Textbook Reading</option>
+              <option value="Health">Study Habit / Break</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-close="modalGoal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Daily Goal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Custom JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
